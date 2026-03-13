@@ -1,23 +1,16 @@
-import axios from "axios"
 import {NextResponse} from "next/server"
+import {getGoogleHealth} from "../../../../lib/googlefit"
 
-export async function GET(request:Request){
+export async function GET(req:Request){
 
- const {searchParams} = new URL(request.url)
- const token = searchParams.get("token")
+ const token=req.headers.get("authorization")
 
- const heart = await axios.get(
-  "https://www.googleapis.com/fitness/v1/users/me/dataSources/derived:com.google.heart_rate.bpm:com.google.android.gms:merge/datasets/0-9999999999999",
-  {headers:{Authorization:`Bearer ${token}`}}
- )
+ if(!token){
+  return NextResponse.json({error:"missing token"})
+ }
 
- const spo2 = await axios.get(
-  "https://www.googleapis.com/fitness/v1/users/me/dataSources/derived:com.google.oxygen_saturation:com.google.android.gms:merge/datasets/0-9999999999999",
-  {headers:{Authorization:`Bearer ${token}`}}
- )
+ const data=await getGoogleHealth(token)
 
- return NextResponse.json({
-  heart:heart.data,
-  spo2:spo2.data
- })
+ return NextResponse.json(data)
+
 }

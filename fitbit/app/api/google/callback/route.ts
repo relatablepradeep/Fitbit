@@ -1,25 +1,29 @@
-import axios from "axios"
-import { NextResponse } from "next/server"
+import {NextResponse} from "next/server"
 
-export async function GET(request: Request){
+export async function GET(req:Request){
 
- const {searchParams} = new URL(request.url)
- const code = searchParams.get("code")
+ const {searchParams}=new URL(req.url)
+ const code=searchParams.get("code")
 
- const token = await axios.post(
+ const token=await fetch(
   "https://oauth2.googleapis.com/token",
   {
-   code,
-   client_id:process.env.GOOGLE_CLIENT_ID,
-   client_secret:process.env.GOOGLE_CLIENT_SECRET,
-   redirect_uri:process.env.GOOGLE_REDIRECT_URI,
-   grant_type:"authorization_code"
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    client_id:process.env.GOOGLE_CLIENT_ID,
+    client_secret:process.env.GOOGLE_CLIENT_SECRET,
+    code:code,
+    grant_type:"authorization_code",
+    redirect_uri:process.env.GOOGLE_REDIRECT
+   })
   }
  )
 
- const accessToken = token.data.access_token
+ const data=await token.json()
 
  return NextResponse.redirect(
-  `http://localhost:3000/dashboard?google=${accessToken}`
+  "http://localhost:3000/dashboard?token="+data.access_token
  )
+
 }
