@@ -1,3 +1,5 @@
+
+
 export default function Home(){
 
  return(
@@ -15,6 +17,10 @@ export default function Home(){
    <a href="/api/google/login">
     <button>Connect Google Fit</button>
    </a>
+
+
+
+   
 
   </div>
 
